@@ -8,7 +8,22 @@ public class VNGameKit : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "ImageWrapper", "RenderCore", "RHI", "Renderer", "UMG", "Slate", "SlateCore",  "ApplicationCore" });
+        PublicDependencyModuleNames.AddRange(new string[] 
+		{
+			"Core", 
+			"CoreUObject", 
+			"Engine", 
+			"InputCore", 
+			"EnhancedInput", 
+			"ImageWrapper", 
+			"RenderCore", 
+			"RHI", 
+			"Renderer", 
+			"UMG", 
+			"Slate", 
+			"SlateCore",  
+			"ApplicationCore"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

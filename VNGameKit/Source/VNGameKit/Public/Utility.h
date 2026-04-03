@@ -54,5 +54,19 @@ public:
 		UUserWidget* Widget,
 		FVector2D Size,
 		const FString& Path);
+
+	/** 正規表現で文字列を抽出（括弧1個 or 全体） */
+	UFUNCTION(BlueprintPure)
+	static TArray<FString> ExtractPattern(const FString& Input, const FString& InPattern, const bool bFullMatch);
+
+public:
+
+	// Blueprintから呼べる四則演算関数
+	UFUNCTION(BlueprintPure, Category = "VN|Math")
+	static double EvaluateExpression(const FString& Input);
+
+private:
+	// 内部パーサ関数（再帰下降パーサ）
+	static double EvaluateExpression_Internal(const FString& Expr, int32& Index);
 	
 };
