@@ -22,8 +22,9 @@ public class VNGameKit : ModuleRules
 			"UMG", 
 			"Slate", 
 			"SlateCore",  
-			"ApplicationCore"
-		});
+			"ApplicationCore",
+            "RuntimeAudioImporter"
+        });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
