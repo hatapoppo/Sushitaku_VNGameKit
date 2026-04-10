@@ -41,25 +41,53 @@ void USoundSlot::PlaySound(const FString InSoundFileName, const float InVolume, 
 	UImportedSoundWave* SoundWave = CacheMap.Find(InSoundFileName)->Get();
 	SoundWave->SetLooping(bIsLoop);
 
+	float FadeTime = FMath::Max(0.01f, InFadeTime);
+
 	// 再生、または音声差し替え
-	if (!IsValid(AudioComponent) || !IsValid(AudioComponent->Sound))
+	if (!IsValid(AudioComponent))
 	{
+		SoundWave->SetNumOfPlayedFrames(0);
 		CreateAudioComponent(SoundWave, InVolume);
-		//AudioComponent->SetVolumeMultiplier(0.0f);
+
+		// フェードイン
+		AudioComponent->FadeIn(FadeTime, 1.0f);
+
 	}
 	// 再生中のサウンド　かつ　鳴らし直さない設定なら音量変更以外をスキップ
 	else if (!CurrentSoundFileName.Equals(InSoundFileName) || bRestart)
 	{
-		// 音声差し替え、鳴らし直し
-		AudioComponent->Stop();
-		AudioComponent->SetSound(SoundWave);
+
+		// フェードアウト
+		AudioComponent->FadeOut(0.1f,0.0f);
+		
+		// タイマーで待つ
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle,
+			[this, SoundWave, InVolume, FadeTime]()
+			{
+				AudioComponent->Stop();
+
+				// 音声差し替え
+				SoundWave->SetNumOfPlayedFrames(0);
+				AudioComponent->SetSound(SoundWave);
+				AudioComponent->SetVolumeMultiplier(InVolume);
+				// フェードイン
+				AudioComponent->FadeIn(FadeTime, 1.0f,0.0f);
+			},
+			0.1f, // FadeOutと同じ時間
+			false
+		);
+
+
+
+	}
+	else
+	{
 		AudioComponent->SetVolumeMultiplier(InVolume);
-		AudioComponent->Play();
 	}
 
 
-	// フェードイン
-	AudioComponent->FadeIn(InFadeTime, 1.0f);
 
 	CurrentSoundFileName = InSoundFileName;
 
@@ -69,9 +97,10 @@ void USoundSlot::PlaySound(const FString InSoundFileName, const float InVolume, 
 
 void USoundSlot::StopSound(const float FadeTime)
 {
-	if (IsValid(AudioComponent) && IsValid(AudioComponent->Sound))
+	if (IsValid(AudioComponent))
 	{
 		AudioComponent->FadeOut(FadeTime, 0.0f);
+		CurrentSoundFileName = FString();
 	}
 }
 
@@ -226,7 +255,8 @@ void USoundSlot::CreateAudioComponent(UImportedSoundWave* InSoundWave, float InV
 {
 	DestroyAudioComponent();
 
-	AudioComponent = UGameplayStatics::CreateSound2D(WorldContextObject, InSoundWave, InVolume);
+	AudioComponent = UGameplayStatics::CreateSound2D(WorldContextObject, InSoundWave, InVolume,1.0f,0.0f,nullptr,false,false);
+
 }
 
 

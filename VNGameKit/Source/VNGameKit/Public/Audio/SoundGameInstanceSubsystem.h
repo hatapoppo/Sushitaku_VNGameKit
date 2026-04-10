@@ -57,6 +57,10 @@ public:
     UFUNCTION(BlueprintCallable)
     void UpdatePendingLoadQueue(const EVNSoundType InSoundType, const TArray<FString> SoundFileNameList);
 
+    // 全てのサウンドを停止する
+    UFUNCTION(BlueprintCallable)
+    void StopAllSound(const float InFadeTime = 0.0f);
+
 
 private:
     USoundSlot* GetSoundSlot(const EVNSoundType) const;
