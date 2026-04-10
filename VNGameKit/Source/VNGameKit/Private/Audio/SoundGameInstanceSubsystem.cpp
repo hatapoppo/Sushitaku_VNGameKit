@@ -13,6 +13,11 @@ void  USoundGameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collecti
 			TObjectPtr<USoundSlot> Slot = NewObject<USoundSlot>(this);
 			Slot->Init(GetGameInstance());
 			SoundSlotMap.Add(Type, Slot);
+
+			if (Type == EVNSoundType::BGM1 || Type == EVNSoundType::BGM2)
+			{
+				Slot->bIsLoop = true;
+			}
 		}
 	}
 }
@@ -29,6 +34,34 @@ void USoundGameInstanceSubsystem::SetOptionVolumeData(TMap<EVNSoundType, float> 
 
 void USoundGameInstanceSubsystem::VNPlaySound(const EVNSoundType InSoundType, const FString InSoundFileName, const float InVolume, const float InFadeTime, const bool bInIsRestart)
 {
+
+	FString Path = InSoundFileName;
+
+	// 拡張子がない場合は検索
+	if (FPaths::GetExtension(InSoundFileName).IsEmpty())
+	{
+		FString Directory = FPaths::GetPath(InSoundFileName);
+		FString BaseName = FPaths::GetCleanFilename(InSoundFileName);
+
+		static const TArray<FString> Extensions =
+		{
+			TEXT("wav"),
+			TEXT("mp3"),
+			TEXT("ogg"),
+			TEXT("flac"),
+			TEXT("m4a")
+		};
+
+		for (const FString& Ext : Extensions)
+		{
+			FString TestPath = Directory / (BaseName + TEXT(".") + Ext);
+			if (FPaths::FileExists(TestPath))
+			{
+				Path = TestPath;
+				break;
+			}
+		}
+	}
 
 	USoundSlot* SoundSlot = GetSoundSlot(InSoundType);
 	if (!SoundSlot)
@@ -48,7 +81,7 @@ void USoundGameInstanceSubsystem::VNPlaySound(const EVNSoundType InSoundType, co
 		// ワーニング
 	}
 
-	SoundSlot->PlaySound(InSoundFileName, InVolume * OptionVolumeMultiplyValue, InFadeTime, bInIsRestart);
+	SoundSlot->PlaySound(Path, InVolume * OptionVolumeMultiplyValue, InFadeTime, bInIsRestart);
 
 }
 

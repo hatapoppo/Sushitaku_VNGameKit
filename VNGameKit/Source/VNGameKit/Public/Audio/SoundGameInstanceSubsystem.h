@@ -24,6 +24,10 @@ enum class EVNSoundType : uint8
 
 ENUM_RANGE_BY_COUNT(EVNSoundType, EVNSoundType::MAX)
 
+/*
+* サウンドデータ構造体
+*/
+
 
 
 /*
