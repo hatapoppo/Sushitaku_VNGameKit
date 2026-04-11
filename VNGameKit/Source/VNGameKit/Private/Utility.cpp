@@ -490,6 +490,18 @@ double AUtility::EvaluateExpression_Internal(const FString& Expr, int32& Index)
 					Index++;
 					Value /= ParseFactor();
 				}
+				else if (Expr[Index] == '%') 
+				{
+					Index++;
+					double RHS = ParseFactor();
+
+					if (RHS == 0)
+					{
+						return 0;
+					}
+
+					Value = FMath::Fmod(Value, RHS);
+				}
 				else break;
 			}
 
