@@ -5,7 +5,7 @@ void  USoundGameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collecti
 {
 	Super::Initialize(Collection);
 
-	// SoundSlot����
+	// SoundSlot生成
 	for (EVNSoundType Type : TEnumRange<EVNSoundType>())
 	{
 		if (Type != EVNSoundType::MAX)
@@ -27,9 +27,30 @@ void USoundGameInstanceSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-void USoundGameInstanceSubsystem::SetOptionVolumeData(TMap<EVNSoundType, float> InOptionVolumeData)
+void USoundGameInstanceSubsystem::SetOptionVolumeData(float InBGMVolume, float InSEVolume)
 {
-	OptionVolumeData = InOptionVolumeData;
+	OptionVolumeBGM = InBGMVolume;
+	OptionVolumeSE = InSEVolume;
+
+	for (const auto& Pair : SoundSlotMap)
+	{
+		switch (Pair.Key)
+		{
+		case EVNSoundType::BGM1:
+		case EVNSoundType::BGM2:
+			Pair.Value->ChangeVolumeMultipiler(OptionVolumeBGM / 100.0f);
+			break;
+
+		case EVNSoundType::SE:
+			Pair.Value->ChangeVolumeMultipiler(OptionVolumeSE / 100.0f);
+			break;
+
+		default:
+			break;
+
+		}
+	}
+
 }
 
 void USoundGameInstanceSubsystem::VNPlaySound(const EVNSoundType InSoundType, const FString InSoundFileName, const float InVolume, const float InFadeTime, const bool bInIsRestart)
@@ -37,7 +58,7 @@ void USoundGameInstanceSubsystem::VNPlaySound(const EVNSoundType InSoundType, co
 
 	FString Path = InSoundFileName;
 
-	// �g���q���Ȃ��ꍇ�͌���
+	// 拡張子が見つからなかった場合、検索
 	if (FPaths::GetExtension(InSoundFileName).IsEmpty())
 	{
 		FString Directory = FPaths::GetPath(InSoundFileName);
@@ -69,19 +90,26 @@ void USoundGameInstanceSubsystem::VNPlaySound(const EVNSoundType InSoundType, co
 		return;
 	}
 
-	// �L���b�V�����Ă���I�v�V�����̒l���擾
-	float OptionVolumeMultiplyValue = 1.0f;
+	float OptionVolumeMultiplier = 1.0f;
 
-	if (OptionVolumeData.Contains(InSoundType))
+	// サウンドタイプによって参照するオプションを切り替える
+	switch (InSoundType)
 	{
-		OptionVolumeMultiplyValue = *OptionVolumeData.Find(InSoundType);
-	}
-	else
-	{
-		// ���[�j���O
+	case EVNSoundType::BGM1:
+	case EVNSoundType::BGM2:
+		OptionVolumeMultiplier = OptionVolumeBGM / 100.0f;
+		break;
+
+	case EVNSoundType::SE:
+		OptionVolumeMultiplier = OptionVolumeSE / 100.0f;
+		break;
+
+	default:
+		break;
+
 	}
 
-	SoundSlot->PlaySound(Path, InVolume * OptionVolumeMultiplyValue, InFadeTime, bInIsRestart);
+	SoundSlot->PlaySound(Path, InVolume ,OptionVolumeMultiplier, InFadeTime, bInIsRestart);
 
 }
 
