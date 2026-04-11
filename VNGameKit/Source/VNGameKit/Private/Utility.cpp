@@ -536,3 +536,25 @@ double AUtility::EvaluateExpression_Internal(const FString& Expr, int32& Index)
 
 	return ParseExpression();
 }
+
+bool AUtility::IsValidExpressionString(const FString& Expr)
+{
+	for (int32 i = 0; i < Expr.Len(); i++)
+	{
+		TCHAR C = Expr[i];
+
+		if (FChar::IsDigit(C) ||
+			C == '+' || C == '-' ||
+			C == '*' || C == '/' || C == '%' ||
+			C == '(' || C == ')' ||
+			FChar::IsWhitespace(C))
+		{
+			continue;
+		}
+
+		// それ以外は全部NG
+		return false;
+	}
+
+	return true;
+}

@@ -61,6 +61,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Math")
 	static double EvaluateExpression(const FString& Input);
 
+	UFUNCTION(BlueprintPure, Category = "Math")
+	static bool IsValidExpressionString(const FString& Expr);
+
 private:
 	// 内部パーサ関数（再帰下降パーサ）
 	static double EvaluateExpression_Internal(const FString& Expr, int32& Index);
