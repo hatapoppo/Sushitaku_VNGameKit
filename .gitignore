@@ -7,3 +7,5 @@ VNGameKit/.vs/
 VNGameKit/.vscode/
 VNGameKit/Mods/*
 !VNGameKit/Mods/ここにシナリオフォルダを入れる.txt
+VNGameKit/Build/Windows/FileOpenOrder/CookerOpenOrder.log
+VNGameKit/Build/Windows/FileOpenOrder/EditorOpenOrder.log
